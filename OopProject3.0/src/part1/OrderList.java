@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 public class OrderList {
     //Declaration
     private User user;
@@ -98,7 +100,7 @@ public class OrderList {
 
         //Check user in order list
         for(int i = 0; i<orderList.size(); i++) {
-            if(user == orderList.get(i).getUser()) {
+            if(user.getNoMatrics().equalsIgnoreCase(orderList.get(i).getUser().getNoMatrics())) {
                 exist = true;
                 orderListNo = i;
                 break;
@@ -123,7 +125,7 @@ public class OrderList {
                     System.out.println("Your already order the food, do you want to increase the number of food.(Y/N)");
                     String comfirm = input.nextLine();
                     if(comfirm.equalsIgnoreCase("y")) {
-                        this.food.get(productListNo).setQuantityInOrder(this.food.get(productListNo).getQuantityInOrder() + food.getQuantityInOrder() );
+                        orderList.get(orderListNo).getFood().get(productListNo).setQuantityInOrder(orderList.get(orderListNo).getFood().get(productListNo).getQuantityInOrder() + food.getQuantityInOrder() );
                     }else if(comfirm.equalsIgnoreCase("n")) {
 
                     }else { //if user input other than y or n
@@ -131,6 +133,46 @@ public class OrderList {
                         valid = false;
                     }
                 }while(!valid);
+                //if user didn't order the food before
+            }else {
+                orderList.get(orderListNo).food.add(food);
+            }
+            //if user is not exist in the order list yet
+        }else {
+            orderList.add(new OrderList(user, food, strdate));
+        }
+    }
+    
+    public void setOrderFoodGui(List<OrderList> orderList, User user, Food food) {
+        Boolean exist = false,existfood = false;
+        int orderListNo = 0,productListNo = 0;
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        String strdate = formatter.format(date);
+
+        //Check user in order list
+        for(int i = 0; i<orderList.size(); i++) {
+            if(user.getNoMatrics().equalsIgnoreCase(orderList.get(i).getUser().getNoMatrics())) {
+                exist = true;
+                orderListNo = i;
+                break;
+            }
+        }
+        if(exist) {
+            //Check product in the list
+            for(int i = 0; i<orderList.get(orderListNo).food.size(); i++) {
+                if(food.getProductName().equals(orderList.get(orderListNo).getFood().get(i).getProductName())
+                        && food.getSauce() == orderList.get(orderListNo).getFood().get(i).getSauce()) {
+                    existfood = true;
+                    productListNo = i;
+                    break;
+                }
+            }
+            //if user had already order the same food before
+            if(existfood) {
+	            if(JOptionPane.showConfirmDialog(null,"Your already order the food, do you want to increase the number of food.", "Exist Food",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_NO_OPTION) {
+	            	orderList.get(orderListNo).getFood().get(productListNo).setQuantityInOrder(orderList.get(orderListNo).getFood().get(productListNo).getQuantityInOrder() + food.getQuantityInOrder() );
+	            }
                 //if user didn't order the food before
             }else {
                 orderList.get(orderListNo).food.add(food);
@@ -151,7 +193,7 @@ public class OrderList {
 
         //Check user in order list
         for(int i = 0; i<orderList.size(); i++) {
-            if(user == orderList.get(i).getUser()) {
+            if(user.getNoMatrics().equalsIgnoreCase(orderList.get(i).getUser().getNoMatrics())) {
                 exist = true;
                 orderListNo = i;
                 break;
@@ -178,7 +220,7 @@ public class OrderList {
                     System.out.println("Your already order the drink, do you want to increase the number of drink.(Y/N)");
                     String comfirm = input.nextLine();
                     if(comfirm.equalsIgnoreCase("y")) {
-                        this.drink.get(productListNo).setQuantityInOrder(this.drink.get(productListNo).getQuantityInOrder() + drink.getQuantityInOrder() );
+                    	orderList.get(orderListNo).getDrink().get(productListNo).setQuantityInOrder(orderList.get(orderListNo).getDrink().get(productListNo).getQuantityInOrder() + drink.getQuantityInOrder() );
                     }else if(comfirm.equalsIgnoreCase("n")) {
 
                     }else {//if user input other than y or n
@@ -193,6 +235,47 @@ public class OrderList {
             //if user is not exist in the order list yet
         }else {
             orderList.add(new OrderList(user, drink, strdate));
+        }
+    }
+    
+    public void setOrderDrinkGui(List<OrderList> orderList, User user, Drink drink) {
+        Boolean exist = false,existfood = false;
+        int orderListNo = 0,productListNo = 0;
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        String strdate = formatter.format(date);
+
+        //Check user in order list
+        for(int i = 0; i<orderList.size(); i++) {
+            if(user.getNoMatrics().equalsIgnoreCase(orderList.get(i).getUser().getNoMatrics())) {
+                exist = true;
+                orderListNo = i;
+                break;
+            }
+        }
+        if(exist) {
+            //Check product in the list
+            for(int i = 0; i<orderList.get(orderListNo).drink.size(); i++) {
+            	if(drink.getProductName().equalsIgnoreCase(orderList.get(orderListNo).getDrink().get(i).getProductName()) 
+                        && drink.getHot() == orderList.get(orderListNo).getDrink().get(i).getHot()
+                        && drink.getLarge() == orderList.get(orderListNo).getDrink().get(i).getLarge()) {
+                    existfood = true;
+                    productListNo = i;
+                    break;
+                }
+            }
+            //if user had already order the same food before
+            if(existfood) {
+	            if(JOptionPane.showConfirmDialog(null,"Your already order the drink, do you want to increase the number of drink.", "Exist drink",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_NO_OPTION) {
+	            	orderList.get(orderListNo).getDrink().get(productListNo).setQuantityInOrder(orderList.get(orderListNo).getDrink().get(productListNo).getQuantityInOrder() + drink.getQuantityInOrder() );
+	            }
+                //if user didn't order the food before
+            }else {
+            	orderList.get(orderListNo).drink.add(drink);
+            }
+            //if user is not exist in the order list yet
+        }else {
+        	orderList.add(new OrderList(user, drink, strdate));
         }
     }
 

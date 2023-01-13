@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,7 +25,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
@@ -36,6 +39,12 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableColumnModel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import java.awt.FlowLayout;
 
 public class Frame2 {
 
@@ -47,7 +56,8 @@ public class Frame2 {
     List<OrderList>orderList = new ArrayList<>();
     List<User>user = new ArrayList<>();
     
-    int qtSlider;
+    int qtSlider, sauce, arr, userArr;
+    Boolean hot, large;
     
 	/**
 	 * Create the application.
@@ -109,6 +119,7 @@ public class Frame2 {
 		drinkPanelOut.setVisible(false);
 		
 		JPanel viewPanel = new JPanel();
+		viewPanel.setLayout(null);
 		viewPanel.setBackground(new Color(255,255,255,200));
 		viewPanel.setBounds(209,78,864,509);
     	panel.add(viewPanel);
@@ -116,19 +127,50 @@ public class Frame2 {
 		
 		JPanel foodPanelDetail = new JPanel();
 		foodPanelDetail.setLayout(null);
-		foodPanelDetail.setBackground(new Color(255,255,255));
+		foodPanelDetail.setBackground(new Color(255,255,255,200));
 		foodPanelDetail.setBounds(209,78,864,509);
     	panel.add(foodPanelDetail);
     	foodPanelDetail.setVisible(false);
-    	getSlider(foodPanelDetail);
+    	
+    	JPanel foodPanelDetailIn = new JPanel();
+		foodPanelDetailIn.setLayout(null);
+		foodPanelDetailIn.setBackground(Color.WHITE);
+		foodPanelDetailIn.setBounds(208,41,452,438);
+    	foodPanelDetail.add(foodPanelDetailIn);
+    	
+    	JButton btnAddOrderFood = new JButton("Add Order");
+    	btnAddOrderFood.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			orderFood();
+    			foodPanelDetail.setVisible(false);
+    			panel_1.setVisible(true);
+    		}
+    	});
+    	btnAddOrderFood.setBounds(150, 390, 155, 40);
     	
     	JPanel drinkPanelDetail = new JPanel();
     	drinkPanelDetail.setLayout(null);
-		drinkPanelDetail.setBackground(new Color(255,255,255));
+		drinkPanelDetail.setBackground(new Color(255,255,255,200));
 		drinkPanelDetail.setBounds(209,78,864,509);
     	panel.add(drinkPanelDetail);
     	drinkPanelDetail.setVisible(false);
-    	getSlider(drinkPanelDetail);
+    	
+    	JPanel drinkPanelDetailIn = new JPanel();
+		drinkPanelDetailIn.setLayout(null);
+		drinkPanelDetailIn.setBackground(new Color(255,255,255));
+		drinkPanelDetailIn.setBounds(208,41,452,438);
+    	drinkPanelDetail.add(drinkPanelDetailIn);
+    	drinkPanelDetailIn.setVisible(true);
+    	
+    	JButton btnAddOrderDrink = new JButton("Add Order");
+    	btnAddOrderDrink.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			orderDrink();
+    			drinkPanelDetail.setVisible(false);
+    			panel_1.setVisible(true);
+    		}
+    	});
+    	btnAddOrderDrink.setBounds(150, 390, 155, 40);
 		
 		JScrollPane fsp = new JScrollPane();
 		fsp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -240,7 +282,7 @@ public class Frame2 {
 		  }
 		});
 		
-		int userArr = orderList.get(0).findUser(orderList, userLogin);
+		userArr = orderList.get(0).findUser(orderList, userLogin);
 		if(userArr != -1) {
 			getTable(viewPanel);
 		}
@@ -278,7 +320,7 @@ public class Frame2 {
             			JOptionPane.showMessageDialog(null, "You have not ordered anything", "Undefined", JOptionPane.WARNING_MESSAGE);
             		}else {
             			String[] choices = { "Cancel all order", "Cancel an item from the order"};
-        			    String input = (String) JOptionPane.showInputDialog(null, "Choose now...", "The Choice of a Lifetime", JOptionPane.QUESTION_MESSAGE,null, choices, choices[1]); 
+        			    String input = (String) JOptionPane.showInputDialog(null, "Choose one...", "Cancel Order", JOptionPane.QUESTION_MESSAGE,null, choices, choices[1]); 
         			    if(input != null) {
 	        			    if(input.equalsIgnoreCase(choices[0])) {
 	        			    	if(JOptionPane.showConfirmDialog(null, "Do you want to cancel all order?", "Confirm",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_NO_OPTION) {
@@ -325,11 +367,17 @@ public class Frame2 {
 		for(int i=0; i<btnFood.length ; i++) {
 			btnFood[i] = new JButton(food.get(i).toString());
 			btnFood[i].setFont(new Font("Tahoma", Font.PLAIN, 28));
-			btnFood[i].setActionCommand(food.get(i).toString());
+			btnFood[i].setActionCommand(String.valueOf(i));
 			btnFood[i].addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				foodPanelOut.setVisible(false);
 				foodPanelDetail.setVisible(true);
+				arr = Integer.valueOf(e.getActionCommand());
+				sauce = 3;
+				qtSlider = 1;
+				foodPanelDetailIn.removeAll();
+		    	detailPanel(foodPanelDetailIn,1);
+		    	foodPanelDetailIn.add(btnAddOrderFood);
 			  }
 			});
 			foodPanel.add(btnFood[i]);
@@ -339,18 +387,64 @@ public class Frame2 {
 		for(int i=0; i<btnDrink.length ; i++) {
 			btnDrink[i] = new JButton(drink.get(i).toString());
 			btnDrink[i].setFont(new Font("Tahoma", Font.PLAIN, 28));
-			btnDrink[i].setActionCommand(drink.get(i).toString());
+			btnDrink[i].setActionCommand(String.valueOf(i));
 			btnDrink[i].addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				drinkPanelOut.setVisible(false);
 				drinkPanelDetail.setVisible(true);
+				arr = Integer.valueOf(e.getActionCommand());
+				hot = true;
+				large = false;
+				qtSlider = 1;
+				drinkPanelDetailIn.removeAll();
+		    	detailPanel(drinkPanelDetailIn,2);
+		    	drinkPanelDetailIn.add(btnAddOrderDrink);
 			  }
 			});
 			drinkPanel.add(btnDrink[i]);
 		}
 	}
 	
-	public void getTable(JPanel viewPanel) {
+	protected void orderFood() {
+		Food foodOrder = new Food("",0,0);
+		foodOrder.setProductName(food.get(arr).getProductName());
+		foodOrder.setDetail(food.get(arr).getDetail());
+		foodOrder.setPrice(food.get(arr).getPrice());
+        foodOrder.setSauce(sauce);
+        foodOrder.setQuantityInOrder(qtSlider);
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        String strdate = formatter.format(date);
+		if(orderList.size() == 0) { 
+            orderList.add(new OrderList(userLogin, foodOrder, strdate));
+        }else {
+            orderList.get(0).setOrderFoodGui(orderList, userLogin, foodOrder);
+        }
+	}
+	
+	protected void orderDrink() {
+		Drink drinkOrder = new Drink("",0,0);
+		drinkOrder.setProductName(drink.get(arr).getProductName());
+		drinkOrder.setDetail(drink.get(arr).getDetail());
+		drinkOrder.setPrice(drink.get(arr).getPrice());
+        drinkOrder.setQuantityInOrder(qtSlider);
+        if(!hot) {
+        	drinkOrder.addIce();
+        }
+        if(large) {
+        	drinkOrder.goLarge();
+        }
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        String strdate = formatter.format(date);
+		if(orderList.size() == 0) { 
+            orderList.add(new OrderList(userLogin, drinkOrder, strdate));
+        }else {
+            orderList.get(0).setOrderDrinkGui(orderList, userLogin, drinkOrder);
+        }
+	}
+
+	protected void getTable(JPanel viewPanel) {
 		int userArr = orderList.get(0).findUser(orderList, userLogin);
 		double totalPrice=0;
 		double totalCalories=0;
@@ -403,7 +497,7 @@ public class Frame2 {
 		viewPanel.add(sp);
 	}
 	
-	public void readFile() throws FileNotFoundException {
+	protected void readFile() throws FileNotFoundException {
         
         //Read product from the file product.txt
         Scanner readFile = new Scanner(new File("product.txt"));
@@ -487,35 +581,42 @@ public class Frame2 {
                 }
             }
 
-            //Food
-            List<Food> foodReadFile = new ArrayList<>();
-            String[] c1 = b[1].split("@",0);
-            for(int i=1 ; i < c1.length ;i++) {
-                String[] d1 = c1[i].split("/",0);
-                int sauce = 0;
-                if(d1[4].equalsIgnoreCase("spicy")) {
-                    sauce = 1;
-                }else if(d1[4].equalsIgnoreCase("tomato")) {
-                    sauce = 2;
-                }else if(d1[4].equalsIgnoreCase("normal")) {
-                    sauce = 3;
-                }
-                //set foodname, calories, price, quantity and sauce into foodReadFile arrayList
-                foodReadFile.add(new Food(d1[0], Double.valueOf(d1[1]), Double.valueOf(d1[2]), Integer.valueOf(d1[3]), sauce));
-                //Set food into orderList arrayList
-                orderList.get(fileloop).setFood(foodReadFile);
-            }
-
-            //Drink
-            List<Drink>drinkReadFile = new ArrayList<>();
-            String[] c2 = b[2].split("@",0);
-            for(int i=1 ; i < c2.length ;i++) {
-                String[] d2 = c2[i].split("/",0);
-                //set DrinkName, calories, price, quantity, goLarge status and addIce status into drinkReadFile arrayList
-                drinkReadFile.add(new Drink(d2[0], Double.valueOf(d2[1]), Double.valueOf(d2[2]), Integer.valueOf(d2[3]) , Boolean.valueOf(d2[4]), Boolean.valueOf(d2[5])));
-                //Set drink into orderList arrayList
-                orderList.get(fileloop).setDrink(drinkReadFile);
-            }
+            if(!b[1].equalsIgnoreCase("")) {
+	            //Food
+	            List<Food> foodReadFile = new ArrayList<>();
+	            String[] c1 = b[1].split("@",0);
+	            for(int i=1 ; i < c1.length ;i++) {
+	                String[] d1 = c1[i].split("/",0);
+	                int sauce = 0;
+	                if(d1[4].equalsIgnoreCase("spicy")) {
+	                    sauce = 1;
+	                }else if(d1[4].equalsIgnoreCase("tomato")) {
+	                    sauce = 2;
+	                }else if(d1[4].equalsIgnoreCase("normal")) {
+	                    sauce = 3;
+	                }
+	                //set foodname, calories, price, quantity and sauce into foodReadFile arrayList
+	                foodReadFile.add(new Food(d1[0], Double.valueOf(d1[1]), Double.valueOf(d1[2]), Integer.valueOf(d1[3]), sauce));
+	                //Set food into orderList arrayList
+	                orderList.get(fileloop).setFood(foodReadFile);
+	            }
+           }else {
+        	   orderList.get(fileloop).getFood().remove(0);
+           }
+           if(!b[2].equalsIgnoreCase("")) {
+	            //Drink
+	            List<Drink>drinkReadFile = new ArrayList<>();
+	            String[] c2 = b[2].split("@",0);
+	            for(int i=1 ; i < c2.length ;i++) {
+	                String[] d2 = c2[i].split("/",0);
+	                //set DrinkName, calories, price, quantity, goLarge status and addIce status into drinkReadFile arrayList
+	                drinkReadFile.add(new Drink(d2[0], Double.valueOf(d2[1]), Double.valueOf(d2[2]), Integer.valueOf(d2[3]) , Boolean.valueOf(d2[4]), Boolean.valueOf(d2[5])));
+	                //Set drink into orderList arrayList
+	                orderList.get(fileloop).setDrink(drinkReadFile);
+	            }
+           }else {
+        	   orderList.get(fileloop).getDrink().remove(0);
+           }
 
             //Date
             //set date into orderList
@@ -524,7 +625,7 @@ public class Frame2 {
         }
 	}
 	
-	public void writeFile() throws IOException {
+	protected void writeFile() throws IOException {
 		 //Write orderList into orderList.txt
         File file = null;
         try {
@@ -542,16 +643,16 @@ public class Frame2 {
         orderFile.close();
 	}
 	
-	public void cancelProduct(int userArr) {
+	protected void cancelProduct(int userArr) {
 		int cancelOrder = -1;
 		String productList[] = new String[orderList.get(userArr).getFood().size()+orderList.get(userArr).getDrink().size()];
-		productList[0] = "";
 		for(int i = 0 ; i < orderList.get(userArr).getFood().size() ; i++) {
-	         productList[i] += orderList.get(userArr).getFood().get(i).toString() + " --- " + orderList.get(userArr).getFood().get(i).getQuantityInOrder();
+			productList[i] = "";
+	        productList[i] += orderList.get(userArr).getFood().get(i).toString() + " --- " + orderList.get(userArr).getFood().get(i).getQuantityInOrder();
 	    }
-		productList[orderList.get(userArr).getFood().size()] = "";
 	    for(int i = orderList.get(userArr).getFood().size(); i<orderList.get(userArr).getFood().size() + orderList.get(userArr).getDrink().size(); i++) {
-	       productList[i] += orderList.get(userArr).getDrink().get(i - orderList.get(userArr).getFood().size()).toString() + " --- " + orderList.get(userArr).getDrink().get(i - orderList.get(userArr).getFood().size()).getQuantityInOrder();
+	    	productList[i] = "";
+	    	productList[i] += orderList.get(userArr).getDrink().get(i - orderList.get(userArr).getFood().size()).toString() + " --- " + orderList.get(userArr).getDrink().get(i - orderList.get(userArr).getFood().size()).getQuantityInOrder();
 	    }
 		String x = (String)JOptionPane.showInputDialog(null, "Select a order to cancel", "Product", JOptionPane.QUESTION_MESSAGE, null, productList, "Tahoma");
 		for(int i=0; i<productList.length ; i++) {
@@ -573,7 +674,7 @@ public class Frame2 {
 		    optionPane.setInputValue(0);
 		    slider.setPaintTicks(true);
 		    slider.setPaintLabels(true);
-		    ChangeListener changeListener = new ChangeListener() {
+		    ChangeListener changeListener = new ChangeListener() { 
 		      public void stateChanged(ChangeEvent changeEvent) {
 		        JSlider theSlider = (JSlider) changeEvent.getSource();
 		        if (!theSlider.getValueIsAdjusting()) {
@@ -617,23 +718,174 @@ public class Frame2 {
 		}
 	}
 	
-	public void getSlider(JPanel panel) {
+	protected void detailPanel(JPanel panel, int foodOrDrink) {
+		
 		JSlider slider = new JSlider();
 	    slider.setMajorTickSpacing(1);
-	    slider.setValue(0);
-	    slider.setMaximum(20);
+    	slider.setMaximum(20);
+    	slider.setMinimum(1);
+    	slider.setValue(1);
+    	slider.setBounds(10, 318, 425, 62);
 	    slider.setPaintTicks(true);
 	    slider.setPaintLabels(true);
-	    ChangeListener changeListener = new ChangeListener() {
+	    ChangeListener changeListener = new ChangeListener() { 
 	      public void stateChanged(ChangeEvent changeEvent) {
 	        JSlider theSlider = (JSlider) changeEvent.getSource();
 	        if (!theSlider.getValueIsAdjusting()) {
-	        	qtSlider = Integer.valueOf(slider.getValue());
+	        	qtSlider = new Integer(theSlider.getValue());
 	        }
 	      }
 	    };
 	    slider.addChangeListener(changeListener);
-	    slider.setVisible(true);
-	    panel.add(slider);
+    	panel.add(slider);
+	    
+    	JRadioButton sauce1 = new JRadioButton("Spicy");
+    	sauce1.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	sauce1.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			sauce = 1;
+    		}
+    	});
+    	JRadioButton sauce2 = new JRadioButton("Tomato");
+    	sauce2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	sauce2.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			sauce = 2;
+    		}
+    	});
+    	JRadioButton sauce3 = new JRadioButton("Normal");
+    	sauce3.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	sauce3.setSelected(true);
+    	sauce3.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			sauce = 3;
+    		}
+    	});
+    	ButtonGroup sauce123 = new ButtonGroup();
+    	sauce123.add(sauce1);sauce123.add(sauce2);sauce123.add(sauce3);
+    	
+    	JRadioButton sauce4 = new JRadioButton("Hot (+0.00)");
+    	sauce4.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	sauce4.setSelected(true);
+    	sauce4.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			hot = true;
+    		}
+    	});
+    	JRadioButton sauce5 = new JRadioButton("Cold (Add Ice)(+0.50)");
+    	sauce5.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	sauce5.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			hot = false;
+    		}
+    	});
+    	ButtonGroup sauce45 = new ButtonGroup();
+    	sauce45.add(sauce4);sauce45.add(sauce5);
+    	
+    	JRadioButton sauce6 = new JRadioButton("Large (+1.50)");
+    	sauce6.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	sauce6.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			large = true;
+    		}
+    	});
+    	JRadioButton sauce7 = new JRadioButton("Small (+0.00)");
+    	sauce7.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	sauce7.setSelected(true);
+    	sauce7.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			large = false;
+    		}
+    	});
+    	ButtonGroup sauce67 = new ButtonGroup();
+    	sauce67.add(sauce6);sauce67.add(sauce7);
+    	
+    	if(foodOrDrink ==1) {
+    	
+    	JPanel saucePanel = new JPanel();
+    	saucePanel.setSize(426, 45);
+    	saucePanel.setLocation(10, 140);
+    	saucePanel.setVisible(true);
+    	panel.add(saucePanel);
+    	saucePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+    	saucePanel.add(sauce3);
+    	saucePanel.add(sauce2);
+    	saucePanel.add(sauce1);
+    	
+    	JTextArea txtrFoodName = new JTextArea();
+    	txtrFoodName.setEditable(false);
+    	txtrFoodName.setBackground(Color.WHITE);
+    	txtrFoodName.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	txtrFoodName.setText("Food Name :");
+    	txtrFoodName.setBounds(10, 10, 120, 50);
+    	panel.add(txtrFoodName);
+    	
+    	JTextArea txtFood = new JTextArea(food.get(arr).getProductName());
+    	txtFood.setEditable(false);
+    	txtFood.setLineWrap(true);
+    	txtFood.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	txtFood.setBackground(new Color(240,240,240));
+    	txtFood.setBounds(136, 10, 297, 100);
+    	panel.add(txtFood);
+    	
+    	JTextPane txtsauce = new JTextPane();
+    	txtsauce.setEditable(false);
+    	txtsauce.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	txtsauce.setText("Sauce :");
+    	txtsauce.setBounds(10, 110, 169, 30);
+    	panel.add(txtsauce);
+    	
+    	JTextPane txtQuantity = new JTextPane();
+    	txtQuantity.setEditable(false);
+    	txtQuantity.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	txtQuantity.setText("Quantity :");
+    	txtQuantity.setBounds(10, 288, 178, 30);
+    	panel.add(txtQuantity);
+    	panel.setVisible(true);
+    	
+    	}else if(foodOrDrink == 2) {
+    	
+    	JPanel sizePanel = new JPanel();
+    	sizePanel.setSize(426, 45);
+    	sizePanel.setLocation(10, 140);
+    	sizePanel.setVisible(true);
+    	panel.add(sizePanel);
+    	sizePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+    	sizePanel.add(sauce7);
+    	sizePanel.add(sauce6);
+    	
+    	JTextPane txtsize = new JTextPane();
+    	txtsize.setEditable(false);
+    	txtsize.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	txtsize.setText("Size :");
+    	txtsize.setBounds(10, 110, 169, 30);
+    	panel.add(txtsize);
+    	
+    	JTextArea txtDrinkName = new JTextArea();
+    	txtDrinkName.setEditable(false);
+    	txtDrinkName.setBackground(Color.WHITE);
+    	txtDrinkName.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	txtDrinkName.setText("Drink Name :");
+    	txtDrinkName.setBounds(10, 10, 120, 50);
+    	panel.add(txtDrinkName);
+    	
+    	JTextArea txtDrink = new JTextArea(drink.get(arr).getProductName());
+    	txtDrink.setEditable(false);
+    	txtDrink.setLineWrap(true);
+    	txtDrink.setFont(new Font("Tahoma", Font.PLAIN, 20));
+    	txtDrink.setBackground(new Color(240,240,240));
+    	txtDrink.setBounds(136, 10, 297, 100);
+    	panel.add(txtDrink);
+    	
+    	JPanel temPanel = new JPanel();
+    	temPanel.setSize(426, 45);
+    	temPanel.setLocation(10, 233);
+    	temPanel.setVisible(true);
+    	panel.add(temPanel);
+    	temPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+    	temPanel.add(sauce4);
+    	temPanel.add(sauce5);
+    	
+    	}
 	}
 }
